@@ -184,7 +184,7 @@ class _WorkoutTimerState extends State<WorkoutTimer>
             children: [
               if (!_isRunning && _remainingSeconds == 0) ...[
                 Switch(
-                  activeColor: appcolorRed,
+                  activeThumbColor: appcolorRed,
                   value: _isIntervalMode,
                   onChanged: (value) {
                     setState(() {

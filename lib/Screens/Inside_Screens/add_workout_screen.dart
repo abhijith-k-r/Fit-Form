@@ -254,7 +254,7 @@ class _AddworkoutScreenState extends State<AddworkoutScreen> {
 
                           buildLabel('Difficulty Level'),
                           DropdownButtonFormField<String>(
-                            value: _selectDifficulty,
+                            initialValue: _selectDifficulty,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),

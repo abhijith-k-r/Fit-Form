@@ -222,7 +222,7 @@ class _EditeWorkoutState extends State<EditeWorkout> {
                     ),
                     buildLabel('Difficulty Level'),
                     DropdownButtonFormField<String>(
-                      value: _selectDifficulty,
+                      initialValue: _selectDifficulty,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),

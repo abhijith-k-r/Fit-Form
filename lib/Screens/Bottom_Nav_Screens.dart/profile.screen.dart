@@ -216,7 +216,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                             trailing: Switch(
                               value: isDark.value,
-                              activeColor: appcolorRed,
+                              activeThumbColor: appcolorRed,
                               onChanged: (value) {
                                 setState(() {
                                   isDark.value = value;

@@ -113,7 +113,7 @@ class _CalorieCalculatorState extends State<CalorieCalculator> {
               Padding(
                 padding: const EdgeInsets.all(25),
                 child: DropdownButtonFormField<String>(
-                  value: selectFoodItems,
+                  initialValue: selectFoodItems,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
