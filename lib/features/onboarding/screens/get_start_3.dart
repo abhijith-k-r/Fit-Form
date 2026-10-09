@@ -1,5 +1,5 @@
 import 'package:fit_form/App_Colors/app_colors.dart';
-import 'package:fit_form/features/auth/screens/sign_in_up.dart';
+import 'package:fit_form/features/onboarding/screens/initial_profile_setup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -77,7 +77,7 @@ class GetStartscreen3 extends StatelessWidget {
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondAnimation) =>
-                              const SignInUp(),
+                              const InitialProfileSetupScreen(),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) =>
                                   FadeTransition(

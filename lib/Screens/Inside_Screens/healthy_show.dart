@@ -31,9 +31,11 @@ class HealthyDietShowScreen extends StatelessWidget {
               height: screenwidth * 0.8,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: diet.healthimage != null
+                  image: (diet.healthimage != null &&
+                          File(diet.healthimage!).existsSync())
                       ? FileImage(File(diet.healthimage!))
-                      : AssetImage('asset/Diet_Plans_Images/HealthyDiet2.jpg')
+                      : const AssetImage(
+                              'asset/Diet_Plans_Images/HealthyDiet2.jpg')
                           as ImageProvider,
                   fit: BoxFit.cover,
                 ),

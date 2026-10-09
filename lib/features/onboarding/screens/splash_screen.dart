@@ -22,52 +22,42 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToNextScreen() async {
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 2));
     final db = await Hive.openBox<Usermodel>('UserBox');
-    final isLog = db.values.any((e) => e.isLog == true);
 
     if (db.isEmpty) {
+      // First time download / open -> show Get Started screens
       Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondAnimation) =>
-                GetStartscreen1(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) =>
-                    FadeTransition(
-              opacity: animation,
-              child: child,
-            ),
-          ));
-    } else if (isLog) {
-      final data = db.values.firstWhere((element) => element.isLog == true);
-      Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondAnimation) =>
-                BottomNaveScreen(
-              id: data.id,
-            ),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) =>
-                    FadeTransition(
-              opacity: animation,
-              child: child,
-            ),
-          ));
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondAnimation) =>
+              const GetStartscreen1(),
+          transitionsBuilder:
+              (context, animation, secondaryAnimation, child) =>
+                  FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        ),
+      );
     } else {
+      // Returning user -> direct navigate to Home Screen!
+      final data = db.values.first;
       Navigator.pushReplacement(
-          context,
-          PageRouteBuilder(
-            pageBuilder: (context, animation, secondAnimation) =>
-                GetStartscreen1(),
-            transitionsBuilder:
-                (context, animation, secondaryAnimation, child) =>
-                    FadeTransition(
-              opacity: animation,
-              child: child,
-            ),
-          ));
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondAnimation) =>
+              BottomNaveScreen(
+            id: data.id,
+          ),
+          transitionsBuilder:
+              (context, animation, secondaryAnimation, child) =>
+                  FadeTransition(
+            opacity: animation,
+            child: child,
+          ),
+        ),
+      );
     }
   }
 

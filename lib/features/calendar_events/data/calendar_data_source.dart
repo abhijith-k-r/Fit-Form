@@ -9,6 +9,10 @@ import 'package:hive_flutter/hive_flutter.dart';
 final ValueNotifier<List<Events>> eventsNotifier =
     ValueNotifier<List<Events>>([]);
 
+/// Reactive notifier specifically for today's events (used by Profile & Home screens).
+final ValueNotifier<List<Events>> todayEventsNotifier =
+    ValueNotifier<List<Events>>([]);
+
 /// Hive CRUD for [Events] — all date-key logic isolated here.
 class CalendarDataSource {
   CalendarDataSource._();
@@ -25,7 +29,7 @@ class CalendarDataSource {
     }
   }
 
-  static Future<void> loadForDay(DateTime date) async {
+  static Future<List<Events>> getEventsForDate(DateTime date) async {
     final box = await _box();
     final Object? rawData = box.get(_dayKey(date));
     final Map<dynamic, dynamic> dayEvents;
@@ -42,10 +46,21 @@ class CalendarDataSource {
       dayEvents = {};
     }
 
-    eventsNotifier.value = dayEvents.values
+    return dayEvents.values
         .map((e) => Events.fromMap(e as Map<dynamic, dynamic>))
         .toList();
+  }
+
+  static Future<void> loadForDay(DateTime date) async {
+    final list = await getEventsForDate(date);
+    eventsNotifier.value = list;
     eventsNotifier.notifyListeners();
+  }
+
+  static Future<void> loadTodayEvents() async {
+    final list = await getEventsForDate(DateTime.now());
+    todayEventsNotifier.value = list;
+    todayEventsNotifier.notifyListeners();
   }
 
   static Future<void> add(DateTime date, Events event) async {
@@ -57,6 +72,7 @@ class CalendarDataSource {
     dayEvents[event.id!] = event.toMap();
     await box.put(key, dayEvents);
     await loadForDay(date);
+    await loadTodayEvents();
   }
 
   static Future<void> delete(DateTime date, String eventId) async {
@@ -69,6 +85,7 @@ class CalendarDataSource {
       await box.put(key, dayEvents);
     }
     await loadForDay(date);
+    await loadTodayEvents();
   }
 
   static Future<void> update(
@@ -83,5 +100,6 @@ class CalendarDataSource {
       await box.put(key, dayEvents);
     }
     await loadForDay(date);
+    await loadTodayEvents();
   }
 }

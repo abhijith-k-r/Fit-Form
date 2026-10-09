@@ -1,8 +1,8 @@
 // ignore_for_file: avoid_types_as_parameter_names
 
 import 'package:fit_form/App_Colors/app_colors.dart';
-import 'package:fit_form/features/auth/screens/sign_in_up.dart';
 import 'package:fit_form/features/onboarding/screens/get_start_2.dart';
+import 'package:fit_form/features/onboarding/screens/initial_profile_setup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,11 +28,18 @@ class GetStartscreen1 extends StatelessWidget {
               top: 70,
               right: 10,
               child: TextButton(
-                  onPressed: () {   Navigator.pushAndRemoveUntil(
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
                         context,
                         PageRouteBuilder(
-                            pageBuilder: (context,animation,secondAnimation) => const SignInUp(),transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child,),),
-                        (Route) => false);},
+                          pageBuilder: (context, animation, secondAnimation) =>
+                              const InitialProfileSetupScreen(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) =>
+                                  FadeTransition(opacity: animation, child: child),
+                        ),
+                        (route) => false);
+                  },
                   child: Text(
                     'Skip',
                     style: GoogleFonts.jost(

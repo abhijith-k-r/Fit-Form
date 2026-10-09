@@ -5,7 +5,7 @@ library;
 ///   lib/features/calendar_events/data/calendar_data_source.dart
 
 export 'package:fit_form/features/calendar_events/data/calendar_data_source.dart'
-    show CalendarDataSource, eventsNotifier;
+    show CalendarDataSource, eventsNotifier, todayEventsNotifier;
 
 import 'package:fit_form/features/calendar_events/data/calendar_data_source.dart';
 import 'package:fit_form/models/events_modal.dart';

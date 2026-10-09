@@ -35,9 +35,12 @@ show_HomeScree_Popup_Profile(BuildContext context, String? data) {
       builder: (BuildContext context) => ValueListenableBuilder(
           valueListenable: userDatas,
           builder: (_, value, __) {
-            final home = value.firstWhere((elements) => elements.id == data);
+            final home = value.firstWhere(
+              (elements) => elements.id == data,
+              orElse: () => value.first,
+            );
             return AlertDialog(
-              backgroundColor: isDark.value ? appcolorblack: appcolorwhite,
+              backgroundColor: isDark.value ? appcolorblack : appcolorwhite,
               title: Column(
                 spacing: 20,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,10 +78,12 @@ show_HomeScree_Popup_Profile(BuildContext context, String? data) {
                                   ? appcolorRed
                                   : const Color.fromARGB(255, 237, 148, 142),
                               radius: 25,
-                              backgroundImage: home.imagePath != null
+                              backgroundImage: home.imagePath != null &&
+                                      File(home.imagePath!).existsSync()
                                   ? FileImage(File(home.imagePath!))
                                   : null,
-                              child: home.imagePath == null
+                              child: (home.imagePath == null ||
+                                      !File(home.imagePath!).existsSync())
                                   ? const Icon(
                                       Icons.person_pin,
                                       size: 20,
@@ -86,16 +91,14 @@ show_HomeScree_Popup_Profile(BuildContext context, String? data) {
                                   : null,
                             ),
                             title: Text(
-                              '${home.fullName}',
-                              style: GoogleFonts.jost(),
-                            ),
-                            subtitle: Text(
-                              '${home.email}',
-                              style: GoogleFonts.jost(fontSize: 12),
+                              home.fullName ?? 'Athlete',
+                              style: GoogleFonts.jost(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                           _buildUserStatRow('Age', home.age),
-                          _buildUserStatRow('Heigt', home.height),
+                          _buildUserStatRow('Height', home.height),
                           _buildUserStatRow('Weight', home.weight),
                         ],
                       ))),

@@ -59,12 +59,15 @@ class HealthyEdit extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: changeImage != null
-                  ? Image.file(
-                      File(changeImage!),
-                      width: screenwidth * 0.8,
-                      height: screenwidth * 0.8,
-                      fit: BoxFit.cover,
+              child: (changeImage != null && File(changeImage!).existsSync())
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        File(changeImage!),
+                        width: screenwidth * 0.8,
+                        height: screenwidth * 0.8,
+                        fit: BoxFit.cover,
+                      ),
                     )
                   : Column(
                       spacing: screenwidth * 0.04,
@@ -115,7 +118,9 @@ class HealthyEdit extends StatelessWidget {
                     healthname: changName.text,
                     healthcalories: changeCalories,
                     healthdescribe: changDescription.text,
-                    healthimage: changeImage);
+                    healthimage: changeImage,
+                    dateTime: changDiets.dateTime ?? DateTime.now(),
+                    favorite: changDiets.favorite);
                 editHealthyDiet(changDiets.id!, updatedDiet);
                 getHealtyDiet();
                 healthyNotify.notifyListeners();

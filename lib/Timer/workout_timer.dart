@@ -1,13 +1,20 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:fit_form/App_Colors/app_colors.dart';
-import 'package:fit_form/Timer/workout_timer_functions.dart';
 import 'package:fit_form/Timer/workout_timer_class.dart';
+import 'package:fit_form/features/workouts/data/completed_workout_data_source.dart';
+import 'package:fit_form/main.dart';
+import 'package:fit_form/models/completed_workout_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class WorkoutTimer extends StatefulWidget {
+  final String workoutName;
+  final String difficulty;
+  final String? workoutDuration;
   final Color workColor;
   final Color restColor;
   final Color backgroundColor;
@@ -15,6 +22,9 @@ class WorkoutTimer extends StatefulWidget {
 
   const WorkoutTimer({
     super.key,
+    this.workoutName = 'Workout Session',
+    this.difficulty = 'Beginner',
+    this.workoutDuration,
     this.workColor = Colors.red,
     this.restColor = Colors.green,
     this.backgroundColor = Colors.white,
@@ -27,27 +37,26 @@ class WorkoutTimer extends StatefulWidget {
 
 class _WorkoutTimerState extends State<WorkoutTimer>
     with SingleTickerProviderStateMixin {
-  // Timer settings
   bool _isIntervalMode = false;
   int _selectedMinutes = 0;
-  int _selectedSeconds = 0;
-  int _remainingSeconds = 0;
-  int _totalSeconds = 0;
+  int _selectedSeconds = 45;
+  int _remainingSeconds = 45;
+  int _totalSeconds = 45;
   int _currentRound = 0;
-  int _totalRounds = 1;
+  final int _totalRounds = 3;
   bool _isWorkPeriod = true;
   Timer? _timer;
   bool _isRunning = false;
+  bool _hasCompleted = false;
   late AnimationController _animationController;
 
-  // Interval settings
-  WorkoutInterval _workInterval = WorkoutInterval(
+  final WorkoutInterval _workInterval = WorkoutInterval(
     name: 'Work',
     minutes: 0,
     seconds: 30,
-    color: appcolorblue,
+    color: appcolorRed,
   );
-  WorkoutInterval _restInterval = WorkoutInterval(
+  final WorkoutInterval _restInterval = WorkoutInterval(
     name: 'Rest',
     minutes: 0,
     seconds: 15,
@@ -61,10 +70,33 @@ class _WorkoutTimerState extends State<WorkoutTimer>
       vsync: this,
       duration: const Duration(seconds: 1),
     );
+
+    // Parse duration if given (e.g. "30s", "1m", "45")
+    if (widget.workoutDuration != null) {
+      final dur = widget.workoutDuration!.toLowerCase().trim();
+      final numericOnly = int.tryParse(dur.replaceAll(RegExp(r'[^0-9]'), ''));
+      if (numericOnly != null && numericOnly > 0) {
+        if (dur.contains('m')) {
+          _selectedMinutes = numericOnly;
+          _selectedSeconds = 0;
+        } else {
+          _selectedMinutes = numericOnly ~/ 60;
+          _selectedSeconds = numericOnly % 60;
+        }
+      }
+    }
+    _remainingSeconds = (_selectedMinutes * 60) + _selectedSeconds;
+    if (_remainingSeconds <= 0) {
+      _remainingSeconds = 45;
+      _selectedSeconds = 45;
+    }
+    _totalSeconds = _remainingSeconds;
   }
 
   void _vibrate() async {
-    await HapticFeedback.heavyImpact();
+    try {
+      await HapticFeedback.heavyImpact();
+    } catch (_) {}
   }
 
   void startTimer() {
@@ -86,7 +118,6 @@ class _WorkoutTimerState extends State<WorkoutTimer>
         if (_remainingSeconds > 0) {
           _remainingSeconds--;
 
-          // Vibrate for last 3 seconds
           if (_remainingSeconds <= 3 && _remainingSeconds > 0) {
             _vibrate();
           }
@@ -98,6 +129,7 @@ class _WorkoutTimerState extends State<WorkoutTimer>
               _timer?.cancel();
               _isRunning = false;
               _vibrate();
+              _promptCompletion();
             }
           }
           _updateProgress();
@@ -120,7 +152,7 @@ class _WorkoutTimerState extends State<WorkoutTimer>
       } else {
         _timer?.cancel();
         _isRunning = false;
-        resetTimer();
+        _promptCompletion();
       }
     } else {
       _currentRound++;
@@ -131,8 +163,10 @@ class _WorkoutTimerState extends State<WorkoutTimer>
   }
 
   void _updateProgress() {
-    double progress = _remainingSeconds / _totalSeconds;
-    _animationController.value = 1.0 - progress;
+    if (_totalSeconds > 0) {
+      double progress = _remainingSeconds / _totalSeconds;
+      _animationController.value = 1.0 - progress;
+    }
   }
 
   void pauseTimer() {
@@ -145,19 +179,112 @@ class _WorkoutTimerState extends State<WorkoutTimer>
   void resetTimer() {
     _timer?.cancel();
     setState(() {
-      _remainingSeconds = 0;
-      _totalSeconds = 0;
-      _currentRound = 0;
       _isRunning = false;
       _isWorkPeriod = true;
       _animationController.value = 0;
+      if (_isIntervalMode) {
+        _currentRound = 0;
+        _remainingSeconds = _workInterval.totalSeconds;
+        _totalSeconds = _remainingSeconds;
+      } else {
+        _remainingSeconds = (_selectedMinutes * 60) + _selectedSeconds;
+        _totalSeconds = _remainingSeconds;
+      }
     });
   }
 
-  String formatTime(int totalSeconds) {
-    int minutes = totalSeconds ~/ 60;
-    int seconds = totalSeconds % 60;
+  String formatTime(int totalSecs) {
+    int minutes = totalSecs ~/ 60;
+    int seconds = totalSecs % 60;
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  Future<void> _recordWorkoutCompletion() async {
+    if (_hasCompleted) return;
+    _hasCompleted = true;
+
+    final session = CompletedWorkout(
+      workoutName: widget.workoutName,
+      difficulty: widget.difficulty,
+      completedAt: DateTime.now(),
+      durationSeconds: _totalSeconds - _remainingSeconds > 0
+          ? _totalSeconds - _remainingSeconds
+          : _totalSeconds,
+    );
+
+    await CompletedWorkoutDataSource.add(session);
+  }
+
+  void _promptCompletion() async {
+    await _recordWorkoutCompletion();
+
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Column(
+          children: [
+            const Icon(Icons.check_circle_outline, color: Colors.green, size: 64),
+            const SizedBox(height: 12),
+            Text(
+              'Workout Completed! 🎉',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.fredoka(fontWeight: FontWeight.w600, fontSize: 22),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Great job finishing "${widget.workoutName}"!',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.jost(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: appcolorRed.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'Level: ${widget.difficulty}',
+                style: GoogleFonts.jost(
+                  color: appcolorRed,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          Center(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: appcolorRed,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+              ),
+              onPressed: () {
+                Navigator.pop(ctx); // Close dialog
+                Navigator.pop(context); // Return to workouts
+              },
+              child: Text(
+                'Done & Back to Home',
+                style: GoogleFonts.jost(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -169,226 +296,318 @@ class _WorkoutTimerState extends State<WorkoutTimer>
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = isDark.value;
     final Color currentColor = _isIntervalMode
         ? (_isWorkPeriod ? widget.workColor : widget.restColor)
         : widget.workColor;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+      backgroundColor: isDarkMode ? appcolorblack : appcolorwhite,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new,
+              color: isDarkMode ? appcolorwhite : appcolorblack),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Column(
+          children: [
+            Text(
+              widget.workoutName,
+              style: GoogleFonts.jost(
+                fontSize: 19,
+                fontWeight: FontWeight.bold,
+                color: isDarkMode ? appcolorwhite : appcolorblack,
+              ),
+            ),
+            Text(
+              widget.difficulty,
+              style: GoogleFonts.jost(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: appcolorRed,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           child: Column(
-            spacing: 20,
-            mainAxisSize: MainAxisSize.min,
             children: [
-              if (!_isRunning && _remainingSeconds == 0) ...[
-                Switch(
-                  activeThumbColor: appcolorRed,
-                  value: _isIntervalMode,
-                  onChanged: (value) {
-                    setState(() {
-                      _isIntervalMode = value;
-                      resetTimer();
-                    });
-                  },
+              // Interval vs Single mode switch
+              if (!_isRunning)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? const Color.fromARGB(255, 34, 34, 34)
+                        : const Color.fromARGB(255, 245, 245, 247),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        _isIntervalMode ? 'Interval Workout' : 'Standard Timer',
+                        style: GoogleFonts.jost(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isDarkMode ? appcolorwhite : appcolorblack,
+                        ),
+                      ),
+                      Switch(
+                        activeThumbColor: appcolorRed,
+                        value: _isIntervalMode,
+                        onChanged: (val) {
+                          setState(() {
+                            _isIntervalMode = val;
+                            resetTimer();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  _isIntervalMode ? 'Interval Timer' : 'Single Timer',
-                  style: GoogleFonts.jost(fontSize: screenWidth * 0.04),
+              const SizedBox(height: 20),
+
+              // Time Adjusters if not running
+              if (!_isRunning && !_isIntervalMode) ...[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildTimePickerColumn(
+                      label: 'Minutes',
+                      value: _selectedMinutes,
+                      max: 60,
+                      onChanged: (val) {
+                        setState(() {
+                          _selectedMinutes = val;
+                          _remainingSeconds =
+                              (_selectedMinutes * 60) + _selectedSeconds;
+                          _totalSeconds = _remainingSeconds;
+                        });
+                      },
+                      isDark: isDarkMode,
+                    ),
+                    const SizedBox(width: 20),
+                    _buildTimePickerColumn(
+                      label: 'Seconds',
+                      value: _selectedSeconds,
+                      max: 59,
+                      onChanged: (val) {
+                        setState(() {
+                          _selectedSeconds = val;
+                          _remainingSeconds =
+                              (_selectedMinutes * 60) + _selectedSeconds;
+                          _totalSeconds = _remainingSeconds;
+                        });
+                      },
+                      isDark: isDarkMode,
+                    ),
+                  ],
                 ),
+                const SizedBox(height: 16),
               ],
 
-              // Timer Settings
-              if (!_isRunning && _remainingSeconds == 0) ...[
-                if (_isIntervalMode) ...[
-                  // Interval Settings
-                  Row(
-                    spacing: 20,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            'Work Time (sec)',
-                            style:
-                                GoogleFonts.jost(fontSize: screenWidth * 0.04),
-                          ),
-                          SizedBox(
-                            width: screenWidth * 0.3,
-                            child: TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  _workInterval = WorkoutInterval(
-                                    name: 'Work',
-                                    minutes: 0,
-                                    seconds: int.tryParse(value) ?? 30,
-                                    color: widget.workColor,
-                                  );
-                                });
-                              },
-                              controller: TextEditingController(
-                                  text: _workInterval.seconds.toString()),
-                            ),
-                          ),
-                        ],
+              // Circular Progress Timer
+              SizedBox(
+                width: widget.circularProgressSize,
+                height: widget.circularProgressSize,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    SizedBox(
+                      width: widget.circularProgressSize,
+                      height: widget.circularProgressSize,
+                      child: CircularProgressIndicator(
+                        value: _totalSeconds > 0
+                            ? 1 - (_remainingSeconds / _totalSeconds)
+                            : 0,
+                        strokeWidth: 12,
+                        backgroundColor: isDarkMode
+                            ? const Color.fromARGB(255, 45, 45, 45)
+                            : Colors.grey[200],
+                        valueColor: AlwaysStoppedAnimation<Color>(currentColor),
                       ),
-                      Column(
-                        children: [
-                          Text(
-                            'Rest Time (sec)',
-                            style:
-                                GoogleFonts.jost(fontSize: screenWidth * 0.04),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          formatTime(_remainingSeconds),
+                          style: GoogleFonts.jost(
+                            fontSize: 48,
+                            fontWeight: FontWeight.bold,
+                            color: isDarkMode ? appcolorwhite : appcolorblack,
                           ),
-                          SizedBox(
-                            width: screenWidth * 0.3,
-                            child: TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  _restInterval = WorkoutInterval(
-                                    name: 'Rest',
-                                    minutes: 0,
-                                    seconds: int.tryParse(value) ?? 15,
-                                    color: widget.restColor,
-                                  );
-                                });
-                              },
-                              controller: TextEditingController(
-                                  text: _restInterval.seconds.toString()),
+                        ),
+                        if (_isIntervalMode) ...[
+                          Text(
+                            _isWorkPeriod ? 'WORK PERIOD' : 'REST PERIOD',
+                            style: GoogleFonts.jost(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: currentColor,
+                            ),
+                          ),
+                          Text(
+                            'Round $_currentRound of $_totalRounds',
+                            style: GoogleFonts.jost(
+                              fontSize: 14,
+                              color: isDarkMode ? Colors.grey[400] : Colors.grey[600],
                             ),
                           ),
                         ],
-                      ),
-                    ],
-                  ),
-                  Wrap(
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            'Rounds: ',
-                            style:
-                                GoogleFonts.jost(fontSize: screenWidth * 0.04),
-                          ),
-                          SizedBox(
-                            width: screenWidth * 0.4,
-                            child: TextField(
-                              keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                              onChanged: (value) {
-                                setState(() {
-                                  _totalRounds = int.tryParse(value) ?? 1;
-                                });
-                              },
-                              controller: TextEditingController(
-                                  text: _totalRounds.toString()),
-                            ),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                ] else ...[
-                  //! Single Timer Settings
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 32),
 
-                  Row(
-                    spacing: 20,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Column(
-                        children: [
-                          Text(
-                            'Minutes',
-                            style:
-                                GoogleFonts.jost(fontSize: screenWidth * 0.04),
-                          ),
-                          SizedBox(
-                            width: 70,
-                            child: DropdownButton<int>(
-                              value: _selectedMinutes,
-                              items: List.generate(60, (index) {
-                                return DropdownMenuItem(
-                                  value: index,
-                                  child: Text(index.toString()),
-                                );
-                              }),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedMinutes = value!;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
+              // Control buttons: Start/Pause and Reset
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: _isRunning ? pauseTimer : startTimer,
+                    icon: Icon(
+                      _isRunning ? Icons.pause : Icons.play_arrow,
+                      color: Colors.white,
+                    ),
+                    label: Text(
+                      _isRunning ? 'Pause' : 'Start',
+                      style: GoogleFonts.jost(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      Column(
-                        children: [
-                          Text(
-                            'Seconds',
-                            style:
-                                GoogleFonts.jost(fontSize: screenWidth * 0.04),
-                          ),
-                          SizedBox(
-                            width: 70,
-                            child: DropdownButton<int>(
-                              value: _selectedSeconds,
-                              items: List.generate(60, (index) {
-                                return DropdownMenuItem(
-                                  value: index,
-                                  child: Text(index.toString()),
-                                );
-                              }),
-                              onChanged: (value) {
-                                setState(() {
-                                  _selectedSeconds = value!;
-                                });
-                              },
-                            ),
-                          ),
-                        ],
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: currentColor,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 28, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
                       ),
-                    ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  OutlinedButton.icon(
+                    onPressed: resetTimer,
+                    icon: Icon(Icons.refresh,
+                        color: isDarkMode ? appcolorwhite : appcolorblack),
+                    label: Text(
+                      'Reset',
+                      style: GoogleFonts.jost(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: isDarkMode ? appcolorwhite : appcolorblack,
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 22, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
                   ),
                 ],
-              ],
+              ),
+              const SizedBox(height: 24),
 
-              //! Circular Progress and Timer Display
-              Stack(alignment: Alignment.center, children: [
-                SizedBox(
-                  width: widget.circularProgressSize,
-                  height: widget.circularProgressSize,
-                  child: TimeCircularProgress(
-                      totalSeconds: _totalSeconds,
-                      remainingSeconds: _remainingSeconds,
-                      currentColor: currentColor),
+              // Complete Workout Button
+              SizedBox(
+                width: screenWidth * 0.75,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    _timer?.cancel();
+                    _isRunning = false;
+                    _promptCompletion();
+                  },
+                  icon: const Icon(Icons.task_alt, color: Colors.white),
+                  label: Text(
+                    'Mark as Completed',
+                    style: GoogleFonts.jost(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green[700],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 3,
+                  ),
                 ),
-                insideProgressContent(
-                    context,
-                    currentColor,
-                    formatTime(_remainingSeconds),
-                    _remainingSeconds,
-                    _isIntervalMode,
-                    _isRunning,
-                    _isWorkPeriod,
-                    _currentRound,
-                    _totalRounds)
-              ]),
-              pauseRestartButton(currentColor, _isRunning, () => pauseTimer(),
-                  () => startTimer(), () => resetTimer()),
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTimePickerColumn({
+    required String label,
+    required int value,
+    required int max,
+    required ValueChanged<int> onChanged,
+    required bool isDark,
+  }) {
+    return Column(
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.jost(
+            fontSize: 13,
+            color: isDark ? Colors.grey[400] : Colors.grey[600],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: isDark
+                ? const Color.fromARGB(255, 34, 34, 34)
+                : const Color.fromARGB(255, 240, 240, 242),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: DropdownButton<int>(
+            value: value,
+            underline: const SizedBox(),
+            dropdownColor: isDark
+                ? const Color.fromARGB(255, 40, 40, 40)
+                : Colors.white,
+            items: List.generate(max + 1, (index) {
+              return DropdownMenuItem(
+                value: index,
+                child: Text(
+                  index.toString().padLeft(2, '0'),
+                  style: GoogleFonts.jost(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? appcolorwhite : appcolorblack,
+                  ),
+                ),
+              );
+            }),
+            onChanged: (val) {
+              if (val != null) onChanged(val);
+            },
+          ),
+        ),
+      ],
     );
   }
 }

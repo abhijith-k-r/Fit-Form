@@ -33,7 +33,8 @@ class _EditeWorkoutState extends State<EditeWorkout> {
   bool isVideoInitialized = false;
 
   Future<void> initializeVideo() async {
-    if (selectedVideo != null) {
+    if (selectedVideo != null && File(selectedVideo!).existsSync()) {
+      _videoController?.dispose();
       _videoController = VideoPlayerController.file(File(selectedVideo!));
 
       try {
@@ -48,6 +49,10 @@ class _EditeWorkoutState extends State<EditeWorkout> {
           isVideoInitialized = false;
         });
       }
+    } else {
+      setState(() {
+        isVideoInitialized = false;
+      });
     }
   }
 
@@ -74,6 +79,9 @@ class _EditeWorkoutState extends State<EditeWorkout> {
     _selectDifficulty = widget.change.difficulty;
     selectedImage = widget.change.workoutsImage;
     selectedVideo = widget.change.workoutvideo;
+    if (selectedVideo != null) {
+      initializeVideo();
+    }
     getWorkouts();
   }
 
@@ -139,21 +147,64 @@ class _EditeWorkoutState extends State<EditeWorkout> {
                           ),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: selectedImage != null
-                            ? Image.file(
-                                File(selectedImage!),
-                                fit: BoxFit.cover,
+                        child: (selectedImage != null &&
+                                File(selectedImage!).existsSync())
+                            ? ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    Image.file(
+                                      File(selectedImage!),
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: 200,
+                                    ),
+                                    Positioned(
+                                      bottom: 10,
+                                      right: 10,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 6),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              Colors.black.withOpacity(0.65),
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: const [
+                                            Icon(Icons.edit,
+                                                size: 14,
+                                                color: Colors.white),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              'Change',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                  fontWeight:
+                                                      FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               )
                             : Column(
-                                spacing: 8,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Icon(
                                     Icons.image,
                                     size: 40,
+                                    color: appcolorgrey.shade400,
                                   ),
+                                  const SizedBox(height: 8),
                                   Text(
-                                    'Click to upload ',
+                                    'Click to upload Image',
                                     style: TextStyle(
                                       color: appcolorgrey.shade500,
                                       fontSize: 14,
@@ -200,12 +251,12 @@ class _EditeWorkoutState extends State<EditeWorkout> {
                         ),
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: GestureDetector(
-                        onTap: pickAndSetVideo,
-                        child: selectedVideo == null
-                            ? buildUploadPrompt()
-                            : buildVideoPlayer(),
-                      ),
+                      child: selectedVideo == null
+                          ? GestureDetector(
+                              onTap: pickAndSetVideo,
+                              child: buildUploadPrompt(),
+                            )
+                          : buildVideoPlayer(),
                     ),
 
                     Wrap(
@@ -280,42 +331,75 @@ class _EditeWorkoutState extends State<EditeWorkout> {
   }
 
   Widget buildVideoPlayer() {
-    if (!isVideoInitialized || selectedVideo == null) {
-      return const Center(
-        child: CircularProgressIndicator(),
+    if (!isVideoInitialized || _videoController == null) {
+      return const SizedBox(
+        height: 200,
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     }
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(6),
-          child: AspectRatio(
-            aspectRatio: _videoController!.value.aspectRatio,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(6),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AspectRatio(
+            aspectRatio: _videoController!.value.aspectRatio > 0
+                ? _videoController!.value.aspectRatio
+                : 16 / 9,
             child: VideoPlayer(_videoController!),
           ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: appcolorblack,
-            borderRadius: BorderRadius.circular(6),
-          ),
-        ),
-        IconButton(
-          icon: Icon(
-            _videoController!.value.isPlaying ? null : Icons.play_arrow,
-            color: appcolorwhite,
-            size: 50,
-          ),
-          onPressed: () {
-            setState(() {
+          if (!_videoController!.value.isPlaying)
+            Container(color: Colors.black38),
+          IconButton(
+            icon: Icon(
               _videoController!.value.isPlaying
-                  ? _videoController!.pause()
-                  : _videoController!.play();
-            });
-          },
-        ),
-      ],
+                  ? Icons.pause_circle_filled
+                  : Icons.play_circle_fill,
+              color: appcolorwhite,
+              size: 54,
+            ),
+            onPressed: () {
+              setState(() {
+                _videoController!.value.isPlaying
+                    ? _videoController!.pause()
+                    : _videoController!.play();
+              });
+            },
+          ),
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: GestureDetector(
+              onTap: pickAndSetVideo,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.7),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.video_collection_outlined,
+                        size: 14, color: Colors.white),
+                    SizedBox(width: 4),
+                    Text(
+                      'Change',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
