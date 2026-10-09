@@ -8,6 +8,7 @@ class AppKeys {
   static const String workoutBox = 'WorkoutBox';
   static const String eventBox = 'EventBox';
   static const String foodItemsBox = 'foodItems';
+  static const String foodCatalogueBox = 'foodCatalogueBox';
   static const String healthyDietsBox = 'HealtyDiets';
   static const String bmiInstructionBox = 'BmiInstructionBox';
   static const String bmiCalculateBox = 'BmiCalculateBox';

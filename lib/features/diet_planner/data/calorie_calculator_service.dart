@@ -1,4 +1,5 @@
-import 'package:fit_form/functions/diet_funtions.dart';
+import 'package:fit_form/core/constants/app_keys.dart';
+import 'package:fit_form/features/diet_planner/data/diet_data_source.dart';
 import 'package:fit_form/models/diet_plan_model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
@@ -10,7 +11,12 @@ class CalorieCalculatorService {
     if (selectedFood == null || g == null || g <= 0 || g > 2000) {
       return false;
     }
-    final f = foodItems.firstWhere((i) => i.foodName == selectedFood);
+    final catalogue = foodCatalogueNotifier.value;
+    final index = catalogue.indexWhere((i) => i.foodName == selectedFood);
+    if (index == -1) {
+      return false;
+    }
+    final f = catalogue[index];
     final m = g / 100;
     final item = FoodItems(
       foodName: f.foodName,
@@ -20,9 +26,9 @@ class CalorieCalculatorService {
       fat: f.fat * m,
       carbohydrates: f.carbohydrates * m,
     );
-    final db = await Hive.openBox<FoodItems>('foodItems');
+    final db = await Hive.openBox<FoodItems>(AppKeys.foodItemsBox);
     await db.add(item);
-    foodItemNotify.value = db.values.toList().cast<FoodItems>();
+    await DietDataSource.refresh();
     return true;
   }
 }

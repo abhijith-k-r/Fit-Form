@@ -6,16 +6,17 @@ library;
 ///   lib/features/diet_planner/data/healthy_diet_data_source.dart
 
 export 'package:fit_form/features/diet_planner/data/diet_data_source.dart'
-    show DietDataSource, foodItemNotifier, catalogueFoodItems;
+    show DietDataSource, foodItemNotifier, foodCatalogueNotifier, catalogueFoodItems;
 
 import 'package:fit_form/features/diet_planner/data/diet_data_source.dart';
 import 'package:fit_form/models/diet_plan_model.dart';
 
-/// Old notifier name.
+/// Old notifier names.
 final foodItemNotify = foodItemNotifier;
+final foodCatalogueNotify = foodCatalogueNotifier;
 
-/// Old food list — now built from catalogueFoodItems to avoid duplication.
-final List<FoodItems> foodItems = catalogueFoodItems;
+/// Dynamic food list — now returns live catalogueFoodItems.
+List<FoodItems> get foodItems => catalogueFoodItems;
 
 Future<void> dietInitialize() => DietDataSource.initialize();
 Future<void> addFoodImes() => DietDataSource.initialize();

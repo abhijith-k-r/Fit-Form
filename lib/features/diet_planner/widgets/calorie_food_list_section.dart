@@ -38,6 +38,21 @@ class CalorieFoodListSection extends StatelessWidget {
           child: ValueListenableBuilder<List<FoodItems>>(
             valueListenable: foodItemNotify,
             builder: (context, List<FoodItems> foods, _) {
+              if (foods.isEmpty) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
+                  child: Center(
+                    child: Text(
+                      'No foods calculated yet.\nSelect a food and enter grams above to calculate!',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.jost(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                );
+              }
               return ListView.builder(
                 physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
