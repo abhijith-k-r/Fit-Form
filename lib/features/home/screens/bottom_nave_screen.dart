@@ -51,57 +51,63 @@ class _BottomNaveScreenState extends State<BottomNaveScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: Container(
-        height: 80,
-        margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(35),
-          boxShadow: [
-            BoxShadow(
-              color: appcolorblack.withOpacity(0.1),
-              blurRadius: 15,
-              spreadRadius: 3,
-            )
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(35),
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: isDark.value
-                ? const Color.fromARGB(255, 37, 36, 36)
-                : appcolorwhite,
-            selectedItemColor: appcolorRed,
-            unselectedItemColor: isDark.value ? appcolorwhite : appcolorblack,
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: 'Home',
+    return ValueListenableBuilder<bool>(
+      valueListenable: isDark,
+      builder: (context, isDarkMode, _) {
+        return Scaffold(
+          body: _screens[_selectedIndex],
+          bottomNavigationBar: Container(
+            height: 80,
+            margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(35),
+              boxShadow: [
+                BoxShadow(
+                  color: appcolorblack.withValues(alpha: 0.1),
+                  blurRadius: 15,
+                  spreadRadius: 3,
+                )
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(35),
+              child: BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                backgroundColor: isDarkMode
+                    ? const Color.fromARGB(255, 37, 36, 36)
+                    : appcolorwhite,
+                selectedItemColor: appcolorRed,
+                unselectedItemColor:
+                    isDarkMode ? appcolorwhite : appcolorblack,
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                items: const [
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.home),
+                    label: 'Home',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.calendar_month_outlined),
+                    label: 'Calendar',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.restaurant),
+                    label: 'Diet Track',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.fitness_center_sharp),
+                    label: 'Customize',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.person_pin),
+                    label: 'Profile',
+                  ),
+                ],
               ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.calendar_month_outlined),
-                label: 'Calendar',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.restaurant),
-                label: 'Diet Track',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.fitness_center_sharp),
-                label: 'Customize',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person_pin),
-                label: 'Profile',
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

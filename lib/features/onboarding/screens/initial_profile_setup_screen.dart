@@ -134,7 +134,7 @@ class _InitialProfileSetupScreenState extends State<InitialProfileSetupScreen> {
                       children: [
                         CircleAvatar(
                           radius: 54,
-                          backgroundColor: appcolorRed.withOpacity(0.15),
+                          backgroundColor: appcolorRed.withValues(alpha: 0.15),
                           backgroundImage: _selectedImagePath != null
                               ? FileImage(File(_selectedImagePath!))
                               : null,
@@ -262,8 +262,8 @@ class _InitialProfileSetupScreenState extends State<InitialProfileSetupScreen> {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.08)
-              : Colors.black.withOpacity(0.06),
+              ? Colors.white.withValues(alpha: 0.08)
+              : Colors.black.withValues(alpha: 0.06),
         ),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),

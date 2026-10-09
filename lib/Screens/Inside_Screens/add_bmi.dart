@@ -309,25 +309,35 @@ class _BmiAddScreeState extends State<BmiAddScree> {
               ),
               const SizedBox(height: 20),
               Row(
-                  spacing: 20,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    textButton(
-                        () => _isLoading ? null : updateInstruction(),
-                        _isLoading ? 'Updating...' : 'Update',
-                        EdgeInsets.zero,
-                        appcolorblue),
-                    textButton(
-                        () => _isLoading ? null : saveInstruction(),
-                        _isLoading ? "Saving..." : "SAVE",
-                        EdgeInsets.zero,
-                        appcolorgreen),
-                    textButton(
-                        () => _isLoading ? null : clearAll(),
-                        _isLoading ? 'Clearing...' : 'Clear All',
-                        EdgeInsets.zero,
-                        appcolorRed)
-                  ])
+                children: [
+                  Expanded(
+                    child: textButton(
+                      () => _isLoading ? null : updateInstruction(),
+                      _isLoading ? 'Updating...' : 'Update',
+                      EdgeInsets.zero,
+                      appcolorblue,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: textButton(
+                      () => _isLoading ? null : saveInstruction(),
+                      _isLoading ? "Saving..." : "SAVE",
+                      EdgeInsets.zero,
+                      appcolorgreen,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: textButton(
+                      () => _isLoading ? null : clearAll(),
+                      _isLoading ? 'Clearing...' : 'Clear All',
+                      EdgeInsets.zero,
+                      appcolorRed,
+                    ),
+                  ),
+                ],
+              ),
             ])));
   }
 }

@@ -1,10 +1,10 @@
 import 'package:fit_form/App_Colors/app_colors.dart';
-
 import 'package:fit_form/Screens/Bottom_Nav_Screens.dart/DietPlanner/bmi_calculator.dart';
 import 'package:fit_form/Screens/Bottom_Nav_Screens.dart/DietPlanner/calorie_calculator.dart';
 import 'package:fit_form/Screens/Bottom_Nav_Screens.dart/DietPlanner/healty_diets.dart';
-import 'package:flutter/material.dart';
+import 'package:fit_form/features/diet_planner/widgets/diet_menu_card.dart';
 import 'package:fit_form/main.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class DietTrackMenuScreen extends StatelessWidget {
@@ -37,107 +37,40 @@ class DietTrackMenuScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildMenuCard(
-                  context,
+                DietMenuCard(
                   title: 'BMI Calculator',
                   icon: Icons.trending_up_outlined,
                   isDark: isDarkMode,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const BmiCalculator()),
-                    );
-                  },
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const BmiCalculator()),
+                  ),
                 ),
                 const SizedBox(height: 16),
-                _buildMenuCard(
-                  context,
+                DietMenuCard(
                   title: 'Calorie Calculator',
                   icon: Icons.calculate,
                   isDark: isDarkMode,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const CalorieCalculator()),
-                    );
-                  },
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const CalorieCalculator()),
+                  ),
                 ),
                 const SizedBox(height: 16),
-                _buildMenuCard(
-                  context,
+                DietMenuCard(
                   title: 'Healthy Diet',
                   icon: Icons.food_bank,
                   isDark: isDarkMode,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HealthyDietPlannerScreen()),
-                    );
-                  },
+                  onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HealthyDietPlannerScreen()),
+                  ),
                 ),
               ],
             ),
           ),
         );
       },
-    );
-  }
-
-  Widget _buildMenuCard(
-    BuildContext context, {
-    required String title,
-    required IconData icon,
-    required bool isDark,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isDark ? const Color.fromARGB(255, 37, 36, 36) : Colors.grey[200],
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 5),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.black : Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                icon,
-                size: 28,
-                color: isDark ? appcolorwhite : appcolorblack,
-              ),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.jost(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: isDark ? appcolorwhite : appcolorblack,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              color: isDark ? Colors.grey[400] : Colors.grey[600],
-              size: 18,
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

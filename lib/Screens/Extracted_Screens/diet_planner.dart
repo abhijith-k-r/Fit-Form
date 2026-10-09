@@ -96,7 +96,6 @@ List<Map<String, dynamic>> carousalItemss = [
 Widget buildPersonalizedRecommendations(List<BmiCalculate> bmiCalculateList) {
   if (bmiCalculateList.isEmpty) {
     return Row(
-      // crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
@@ -118,7 +117,7 @@ Widget buildPersonalizedRecommendations(List<BmiCalculate> bmiCalculateList) {
     padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
     child: Container(
       decoration: BoxDecoration(
-        color: appcolorgrey.withOpacity(0.1),
+        color: appcolorgrey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(15),
       ),
       padding: EdgeInsets.all(16),
@@ -148,7 +147,6 @@ Widget buildPersonalizedRecommendations(List<BmiCalculate> bmiCalculateList) {
               fontWeight: FontWeight.w500,
             ),
           ),
-          // Text('${latestBmiData.timestamp}'),
           getDietRecommendation(latestBmiData.bmicategorry ?? ''),
         ],
       ),
@@ -159,7 +157,9 @@ Widget buildPersonalizedRecommendations(List<BmiCalculate> bmiCalculateList) {
 //  ! Meal_Food_Showing GridView><><><><
 
 Widget buildMealTrackingSection(BuildContext context) {
-  return const MealTrackingSection();
+  return MealTrackingSection(
+    isDarkMode: Theme.of(context).brightness == Brightness.dark,
+  );
 }
 
 Widget customTextfield(

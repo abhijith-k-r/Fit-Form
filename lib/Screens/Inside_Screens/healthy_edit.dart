@@ -121,10 +121,10 @@ class HealthyEdit extends StatelessWidget {
                     healthimage: changeImage,
                     dateTime: changDiets.dateTime ?? DateTime.now(),
                     favorite: changDiets.favorite);
-                editHealthyDiet(changDiets.id!, updatedDiet);
-                getHealtyDiet();
+                await editHealthyDiet(changDiets.id ?? '', updatedDiet);
+                await getHealtyDiet();
                 healthyNotify.notifyListeners();
-                Navigator.pop(context);
+                if (context.mounted) Navigator.pop(context, updatedDiet);
               }, 'EDITE DIETES', EdgeInsets.zero, appcolorgreen),
             ],
           )

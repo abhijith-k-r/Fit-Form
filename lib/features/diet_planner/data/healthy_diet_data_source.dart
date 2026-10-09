@@ -44,12 +44,66 @@ class HealthyDietDataSource {
 
   static Future<void> update(String id, HealtyDiet updated) async {
     final box = await _box();
+    bool found = false;
     for (int i = 0; i < box.length; i++) {
-      if (box.getAt(i)?.id == id) {
+      final item = box.getAt(i);
+      if (item?.id == id && id.isNotEmpty) {
+        updated.id = id;
         await box.putAt(i, updated);
+        found = true;
         break;
+      }
+    }
+    if (!found) {
+      for (int i = 0; i < box.length; i++) {
+        final item = box.getAt(i);
+        if (item?.healthname == updated.healthname) {
+          updated.id = item?.id ?? id;
+          await box.putAt(i, updated);
+          found = true;
+          break;
+        }
       }
     }
     await refresh();
   }
+
+  static List<HealtyDiet> getTodayMeals() {
+    final now = DateTime.now();
+    return healthyDietNotifier.value.where((d) {
+      if (d.dateTime == null) return true;
+      return d.dateTime!.year == now.year &&
+          d.dateTime!.month == now.month &&
+          d.dateTime!.day == now.day;
+    }).toList();
+  }
+
+  static List<HealtyDiet> getTomorrowMeals() {
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    return healthyDietNotifier.value.where((d) {
+      if (d.dateTime == null) return false;
+      return d.dateTime!.year == tomorrow.year &&
+          d.dateTime!.month == tomorrow.month &&
+          d.dateTime!.day == tomorrow.day;
+    }).toList();
+  }
+
+  static List<HealtyDiet> getYesterdayMeals() {
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    return healthyDietNotifier.value.where((d) {
+      if (d.dateTime == null) return false;
+      return d.dateTime!.year == yesterday.year &&
+          d.dateTime!.month == yesterday.month &&
+          d.dateTime!.day == yesterday.day;
+    }).toList();
+  }
+
+  static double getTodayCalories() =>
+      getTodayMeals().fold(0.0, (sum, d) => sum + (d.healthcalories ?? 0.0));
+
+  static double getTomorrowCalories() =>
+      getTomorrowMeals().fold(0.0, (sum, d) => sum + (d.healthcalories ?? 0.0));
+
+  static double getYesterdayCalories() =>
+      getYesterdayMeals().fold(0.0, (sum, d) => sum + (d.healthcalories ?? 0.0));
 }

@@ -91,7 +91,12 @@ show_HomeScree_Popup_Profile(BuildContext context, String? data) {
                                   : null,
                             ),
                             title: Text(
-                              home.fullName ?? 'Athlete',
+                              (home.fullName != null &&
+                                      home.fullName!.trim().isNotEmpty &&
+                                      home.fullName!.trim().toLowerCase() !=
+                                          'abhijith')
+                                  ? home.fullName!
+                                  : 'Athlete',
                               style: GoogleFonts.jost(
                                 fontWeight: FontWeight.bold,
                               ),
