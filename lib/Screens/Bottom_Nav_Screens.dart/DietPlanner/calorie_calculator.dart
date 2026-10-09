@@ -169,9 +169,12 @@ class _CalorieCalculatorState extends State<CalorieCalculator> {
                     borderRadius: BorderRadius.circular(15),
                     color: appcolorRed.withOpacity(0.1),
                   ),
-                  child: ListTile(
-                    title: Text(
-                      'Total Calories: ${totalCalories.toStringAsFixed(2)}',
+                  child: Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      title: Text(
+                        'Total Calories: ${totalCalories.toStringAsFixed(2)}',
+                      ),
                     ),
                   ),
                 ),
@@ -194,7 +197,9 @@ class _CalorieCalculatorState extends State<CalorieCalculator> {
                                       borderRadius: BorderRadius.circular(15),
                                       color: appcolorRed.withOpacity(0.1),
                                     ),
-                                    child: ListTile(
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: ListTile(
                                         onTap: () async {
                                           bool? shouldDelete =
                                               await showDialog<bool>(
@@ -249,7 +254,7 @@ class _CalorieCalculatorState extends State<CalorieCalculator> {
                                             'Protein: ${food.protien.toStringAsFixed(2)} g || '
                                             'Fat: ${food.fat.toStringAsFixed(2)} g || '
                                             'Carbs: ${food.carbohydrates.toStringAsFixed(2)} g',
-                                            style: GoogleFonts.jost()))),
+                                            style: GoogleFonts.jost())))),
                               );
                             });
                       }))

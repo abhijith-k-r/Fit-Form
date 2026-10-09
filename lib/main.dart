@@ -1,53 +1,32 @@
-import 'package:fit_form/Screens/Splash_With_Get_Startss/splash_screen.dart';
-import 'package:fit_form/functions/addworkouts.dart';
-import 'package:fit_form/functions/bmi_functio.dart';
-import 'package:fit_form/functions/calendar_events.dart';
-import 'package:fit_form/functions/diet_funtions.dart';
-import 'package:fit_form/functions/health_diet.dart';
-import 'package:fit_form/models/usermodel.dart';
+import 'package:fit_form/core/services/app_initializer.dart';
+import 'package:fit_form/features/onboarding/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 
-void main() async {
+/// Global dark-mode notifier — kept here so MaterialApp can access it.
+/// In a future refactor this can move to a ThemeDataSource.
+ValueNotifier<bool> isDark = ValueNotifier<bool>(false);
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  if (!Hive.isAdapterRegistered(UsermodelAdapter().typeId)) {
-    Hive.registerAdapter(UsermodelAdapter());
-  }
-  await workoutInitialize();
-
-  await calendarInitialize();
-
-  await dietInitialize();
-
-  await addFoodImes();
-
-  await bmiInitialize();
-
-  await bmicalculateInitialize();
-
-  await healthyDietInitialize();
-
-
-  runApp(const MyAPP());
+  await AppInitializer.init();
+  runApp(const FitFormApp());
 }
 
-class MyAPP extends StatelessWidget {
-  const MyAPP({super.key});
+class FitFormApp extends StatelessWidget {
+  const FitFormApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
+    return ValueListenableBuilder<bool>(
       valueListenable: isDark,
-      builder: (_, isDarkMOde, __) => MaterialApp(
+      builder: (_, isDarkMode, __) => MaterialApp(
+        title: 'Fit Form',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData.light(),
         darkTheme: ThemeData.dark(),
-        themeMode: isDarkMOde ? ThemeMode.dark : ThemeMode.light,
-        debugShowCheckedModeBanner: false,
+        themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
         home: SplashScreen(),
       ),
     );
   }
 }
-
-ValueNotifier<bool> isDark = ValueNotifier<bool>(false);

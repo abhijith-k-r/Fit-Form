@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:fit_form/App_Colors/app_colors.dart';
 import 'package:fit_form/Extracted_Functions/logout_function.dart';
 import 'package:fit_form/Screens/Extracted_Screens/user_details.dart';
-import 'package:fit_form/Screens/Inside_Screens/edit_profile.dart';
+import 'package:fit_form/features/profile/screens/edit_profile.dart';
 import 'package:fit_form/Screens/Inside_Screens/favorite_screen.dart';
 import 'package:fit_form/Screens/Inside_Screens/settings.dart';
 import 'package:fit_form/functions/auth.dart';
@@ -99,9 +99,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         borderRadius: BorderRadius.circular(25),
                       ),
                       height: screenWidth * 0.8,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
+                      child: Material(
+                        color: Colors.transparent,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                           ListTile(
                             onTap: () {
                               Navigator.push(
@@ -243,11 +245,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             ),
-          );
+          ),
+        );
         });
   }
 }

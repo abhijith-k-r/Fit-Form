@@ -65,8 +65,10 @@ show_HomeScree_Popup_Profile(BuildContext context, String? data) {
                           borderRadius: BorderRadius.circular(20)),
                       width: 300,
                       height: 150,
-                      child: Column(
-                        children: [
+                      child: Material(
+                        color: Colors.transparent,
+                        child: Column(
+                          children: [
                           ListTile(
                             leading: CircleAvatar(
                               backgroundColor: isDark.value
@@ -96,7 +98,7 @@ show_HomeScree_Popup_Profile(BuildContext context, String? data) {
                           _buildUserStatRow('Heigt', home.height),
                           _buildUserStatRow('Weight', home.weight),
                         ],
-                      )),
+                      ))),
                 ],
               ),
             );

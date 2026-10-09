@@ -1,10 +1,13 @@
+// ignore_for_file: avoid_types_as_parameter_names
+
 import 'package:fit_form/App_Colors/app_colors.dart';
-import 'package:fit_form/Screens/Authontications_Screens/sign_in_up.dart';
+import 'package:fit_form/features/auth/screens/sign_in_up.dart';
+import 'package:fit_form/features/onboarding/screens/get_start_3.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class GetStartscreen3 extends StatelessWidget {
-  const GetStartscreen3({super.key});
+class GetStartScreen2 extends StatelessWidget {
+  const GetStartScreen2({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +23,27 @@ class GetStartscreen3 extends StatelessWidget {
                 image: DecorationImage(
                     fit: BoxFit.cover,
                     image: AssetImage(
-                      'asset/Splashess_Images/splashAi3.jpg',
+                      'asset/Splashess_Images/SplashAi2.jpg',
                     ))),
           ),
           Positioned(
-            top: 490,
+              top: 70,
+              right: 10,
+              child: TextButton(
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        PageRouteBuilder(
+                            pageBuilder: (context,animation,secondAnimation) => const SignInUp(),transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child,),),
+                        (Route) => false);
+                  },
+                  child: Text(
+                    'Skip',
+                    style: GoogleFonts.jost(
+                        color: appcolorRed, fontWeight: FontWeight.bold),
+                  ))),
+          Positioned(
+            top: 400,
             right: 20,
             left: 20,
             child: RichText(
@@ -32,31 +51,19 @@ class GetStartscreen3 extends StatelessWidget {
               text: TextSpan(
                 children: [
                   TextSpan(
-                    text: ' "Consistency is Key!"',
+                    text: ' "Transform Your Fitness, One ',
                     style: GoogleFonts.fredoka(
                       fontWeight: FontWeight.bold,
-                      fontSize: 36,
+                      fontSize: 24,
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            top: 540,
-            right: 20,
-            left: 20,
-            child: RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                children: [
                   TextSpan(
-                    text:
-                        '"Track your progress, stay motivated, and unlock the best version of yourself with daily challenges and reminders."',
-                    style: GoogleFonts.jost(
-                      fontSize: 16,
+                    text: 'Step at a Time"',
+                    style: GoogleFonts.fredoka(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24,
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -67,7 +74,7 @@ class GetStartscreen3 extends StatelessWidget {
               left: 70,
               child: OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: appcolorRed, width: 1),
+                    side:  BorderSide(color: appcolorRed, width: 1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -76,21 +83,13 @@ class GetStartscreen3 extends StatelessWidget {
                     Navigator.pushReplacement(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondAnimation) =>
-                              const SignInUp(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) =>
-                                  FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          ),
-                        ));
+                            pageBuilder: (context,animation,secondAnimation) => const GetStartscreen3(),transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation,child: child,),));
                   },
                   child: Text(
                     'Next',
                     style: GoogleFonts.inter(
                         color: appcolorwhite, fontWeight: FontWeight.bold),
-                  ))),
+                  )))
         ],
       ),
     );

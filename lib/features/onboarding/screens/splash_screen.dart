@@ -1,8 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:fit_form/App_Colors/app_colors.dart';
-import 'package:fit_form/Screens/Bottom_Nav_Screens.dart/bottom_nave_screen.dart';
-import 'package:fit_form/Screens/Splash_With_Get_Startss/get_start_1.dart';
+import 'package:fit_form/features/home/screens/bottom_nave_screen.dart';
+import 'package:fit_form/features/onboarding/screens/get_start_1.dart';
 import 'package:fit_form/models/usermodel.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';

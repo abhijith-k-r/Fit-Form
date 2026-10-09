@@ -1,5 +1,6 @@
 import 'package:fit_form/App_Colors/app_colors.dart';
 import 'package:fit_form/functions/auth.dart';
+import 'package:fit_form/features/auth/screens/sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -30,7 +31,7 @@ showIsLogOut(BuildContext contxt, String? data) {
   // fetchUserData(data);
   showDialog(
     context: contxt,
-    builder: (BuildContext contxt) {
+    builder: (BuildContext dialogContext) {
       return Center(
           child: AlertDialog(
               title: const Text(
@@ -43,7 +44,13 @@ showIsLogOut(BuildContext contxt, String? data) {
               children: [
                 TextButton(
                   onPressed: () async {
-                    logOut(data, contxt);
+                    await logOut(data);
+                    if (!contxt.mounted) return;
+                    Navigator.pushAndRemoveUntil(
+                      contxt,
+                      MaterialPageRoute(builder: (_) => const SignIn()),
+                      (route) => false,
+                    );
                   },
                   child: Text(
                     'Log out',

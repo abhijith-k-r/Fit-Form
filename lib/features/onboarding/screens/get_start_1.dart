@@ -1,8 +1,8 @@
 // ignore_for_file: avoid_types_as_parameter_names
 
 import 'package:fit_form/App_Colors/app_colors.dart';
-import 'package:fit_form/Screens/Authontications_Screens/sign_in_up.dart';
-import 'package:fit_form/Screens/Splash_With_Get_Startss/get_start_2.dart';
+import 'package:fit_form/features/auth/screens/sign_in_up.dart';
+import 'package:fit_form/features/onboarding/screens/get_start_2.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

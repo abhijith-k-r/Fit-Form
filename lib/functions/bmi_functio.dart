@@ -1,18 +1,13 @@
-// ignore_for_file: unused_local_variable
+library;
 
-import 'package:fit_form/models/bmi_calculate.dart';
-import 'package:fit_form/models/bmi_calculator_model.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+// Legacy compatibility shim.
+/// BMI logic has moved to:
+///   lib/features/bmi/data/bmi_data_source.dart
 
-Future<void> bmiInitialize() async {
-  if (!Hive.isAdapterRegistered(BmiInstructionAdapter().typeId)) {
-    Hive.registerAdapter(BmiInstructionAdapter());
-  }
-}
+export 'package:fit_form/features/bmi/data/bmi_data_source.dart'
+    show BmiDataSource;
 
+import 'package:fit_form/features/bmi/data/bmi_data_source.dart';
 
-Future<void> bmicalculateInitialize() async {
-  if (!Hive.isAdapterRegistered(BmiCalculateAdapter().typeId)) {
-    Hive.registerAdapter(BmiCalculateAdapter());
-  }
-}
+Future<void> bmiInitialize() => BmiDataSource.initialize();
+Future<void> bmicalculateInitialize() => BmiDataSource.initialize();

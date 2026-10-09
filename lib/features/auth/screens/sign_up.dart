@@ -1,7 +1,7 @@
 import 'package:fit_form/App_Colors/app_colors.dart';
 import 'package:fit_form/Extracted_Functions/diet_tracker.dart';
-import 'package:fit_form/Screens/Authontications_Screens/sign_in.dart';
-import 'package:fit_form/Screens/Bottom_Nav_Screens.dart/bottom_nave_screen.dart';
+import 'package:fit_form/features/auth/screens/sign_in.dart';
+import 'package:fit_form/features/home/screens/bottom_nave_screen.dart';
 import 'package:fit_form/functions/auth.dart';
 import 'package:fit_form/models/usermodel.dart';
 import 'package:flutter/material.dart';

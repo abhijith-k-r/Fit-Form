@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:fit_form/App_Colors/app_colors.dart';
 import 'package:fit_form/Extracted_Functions/diet_tracker.dart';
 import 'package:fit_form/Screens/Extracted_Screens/addworkout_functions.dart';
-import 'package:fit_form/Screens/Inside_Screens/edit_profile.dart';
+import 'package:fit_form/features/profile/screens/edit_profile.dart';
 import 'package:fit_form/functions/addworkouts.dart';
 import 'package:fit_form/models/workouts_model.dart';
 import 'package:flutter/material.dart';

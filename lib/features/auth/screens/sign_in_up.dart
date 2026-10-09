@@ -1,6 +1,6 @@
 import 'package:fit_form/App_Colors/app_colors.dart';
-import 'package:fit_form/Screens/Authontications_Screens/sign_in.dart';
-import 'package:fit_form/Screens/Authontications_Screens/sign_up.dart';
+import 'package:fit_form/features/auth/screens/sign_in.dart';
+import 'package:fit_form/features/auth/screens/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
