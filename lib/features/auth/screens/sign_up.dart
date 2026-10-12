@@ -37,6 +37,7 @@ class _SignUpState extends State<SignUp> {
       final details = Usermodel(
           fullName: name, email: email, password: password, isLog: true);
       addSignUp(details);
+      snackBarMessenger(context, 'Account created successfully! 🎉', appcolorgreen);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -254,7 +255,6 @@ class _SignUpState extends State<SignUp> {
                               if (_formKey.currentState!.validate()) {
                                 addDetails();
                               }
-                              snackBarMessenger(context, 'Successfully Created an Account', appcolorgreen);
                             },
                             child: Text(
                               'Sign Up',

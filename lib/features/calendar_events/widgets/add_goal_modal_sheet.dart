@@ -31,6 +31,15 @@ class _AddGoalModalSheetState extends State<AddGoalModalSheet> {
 
   Future<void> _submit() async {
     if (titleController.text.isEmpty || contentController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Please fill in both title and description.'),
+          backgroundColor: Colors.redAccent,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          duration: const Duration(seconds: 2),
+        ),
+      );
       return;
     }
     final newEvent = Events(
@@ -43,7 +52,18 @@ class _AddGoalModalSheetState extends State<AddGoalModalSheet> {
       await fetchEventsForDay(widget.selectedDay!);
       widget.onGoalAdded();
     }
-    if (mounted) Navigator.pop(context);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('🎯 Event added successfully!'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      Navigator.pop(context);
+    }
   }
 
   @override

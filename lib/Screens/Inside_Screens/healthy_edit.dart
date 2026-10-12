@@ -111,6 +111,19 @@ class HealthyEdit extends StatelessWidget {
               textButton(() => Navigator.pop(context), 'CANCEL',
                   EdgeInsets.zero, appcolorRed),
               textButton(() async {
+                if (changName.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Please enter a food name.'),
+                      backgroundColor: Colors.redAccent,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
                 double changeCalories =
                     double.tryParse(changCalories.text) ?? 0.0;
                 final updatedDiet = HealtyDiet(
@@ -124,7 +137,19 @@ class HealthyEdit extends StatelessWidget {
                 await editHealthyDiet(changDiets.id ?? '', updatedDiet);
                 await getHealtyDiet();
                 healthyNotify.notifyListeners();
-                if (context.mounted) Navigator.pop(context, updatedDiet);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('✅ Diet updated successfully!'),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  Navigator.pop(context, updatedDiet);
+                }
               }, 'EDITE DIETES', EdgeInsets.zero, appcolorgreen),
             ],
           )

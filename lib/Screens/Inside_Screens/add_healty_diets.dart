@@ -258,6 +258,16 @@ class _AddHealtyDietsState extends State<AddHealtyDiets> {
 
                       addHeathyDiets(saveHealthyDiet).then((_) {
                         getHealtyDiet();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('🥗 Diet added successfully!'),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
                         Navigator.pop(context);
                       });
                     },

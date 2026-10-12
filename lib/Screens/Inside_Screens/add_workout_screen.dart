@@ -192,6 +192,7 @@ class _AddworkoutScreenState extends State<AddworkoutScreen> {
     getWorkouts();
     // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
     workoutsNotify.notifyListeners();
+    snackBarMessenger(context, '💪 Workout added successfully!', appcolorgreen);
     Navigator.pop(context);
   }
 }

@@ -146,6 +146,20 @@ class _EditeWorkoutState extends State<EditeWorkout> {
                   cancelButtonForAddScreen(context),
                   Expanded(
                     child: textButton(() async {
+                      if (changeName.text.trim().isEmpty ||
+                          changeDuration.text.trim().isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Please fill all required fields.'),
+                            backgroundColor: Colors.redAccent,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                        return;
+                      }
                       final updated = WorkoutsModel(
                         id: widget.change.id,
                         workoutsName: changeName.text,
@@ -162,6 +176,16 @@ class _EditeWorkoutState extends State<EditeWorkout> {
                       await getWorkouts();
                       // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
                       workoutsNotify.notifyListeners();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('✅ Workout updated successfully!'),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
                       Navigator.pop(context);
                     }, 'Edit Exercise', EdgeInsets.zero, appcolorgreen),
                   ),

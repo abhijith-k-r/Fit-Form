@@ -49,7 +49,9 @@ class FavoriteScreen extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 1 / 1.3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    childAspectRatio: 1 / 1.45,
                   ),
                   itemCount: favoriteWorkouts.length,
                   itemBuilder: (context, index) {
