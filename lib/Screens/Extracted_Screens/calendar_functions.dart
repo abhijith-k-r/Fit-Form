@@ -98,7 +98,20 @@ EditFuction(
                                       SelectedDAy, eventId, updatedEvent);
                                   await fetchEventsForDay(SelectedDAy);
 
-                                  if (context.mounted) Navigator.pop(context);
+                                  if (context.mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: const Text('✏️ Event updated successfully!'),
+                                        backgroundColor: Colors.green,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                    Navigator.pop(context);
+                                  }
                                 },
                                 child: Text(
                                   'Update Goals',
@@ -215,11 +228,22 @@ void DeleteFunction(
               children: [
                 TextButton(
                   onPressed: () async {
-                    // Delete event logic
                     await deleteEvent(SelectedDAy, eventId);
                     await fetchEventsForDay(SelectedDAy);
-                    // ignore: use_build_context_synchronously
-                    Navigator.pop(context);
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('🗑️ Event deleted.'),
+                          backgroundColor: Colors.redAccent,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    }
                   },
                   child: Text(
                     'Delete',

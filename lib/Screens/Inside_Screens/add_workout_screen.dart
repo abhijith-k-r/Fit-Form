@@ -1,9 +1,13 @@
-// ignore_for_file: use_build_context_synchronously, must_be_immutable, unnecessary_null_comparison, unused_field, invalid_use_of_visible_for_testing_member
+// ignore_for_file: use_build_context_synchronously, must_be_immutable, unnecessary_null_comparison, unused_field
 import 'dart:io';
+
 import 'package:fit_form/App_Colors/app_colors.dart';
 import 'package:fit_form/Extracted_Functions/diet_tracker.dart';
 import 'package:fit_form/Screens/Extracted_Screens/addworkout_functions.dart';
-import 'package:fit_form/Screens/Inside_Screens/edit_profile.dart';
+import 'package:fit_form/Screens/Inside_Screens/widgets/add_workout_form_fields.dart';
+import 'package:fit_form/Screens/Inside_Screens/widgets/workout_media_pickers.dart';
+import 'package:fit_form/Screens/Inside_Screens/widgets/workout_steps_input.dart';
+import 'package:fit_form/core/services/media_picker_service.dart';
 import 'package:fit_form/functions/addworkouts.dart';
 import 'package:fit_form/models/workouts_model.dart';
 import 'package:flutter/material.dart';
@@ -25,31 +29,25 @@ class AddworkoutScreen extends StatefulWidget {
 }
 
 class _AddworkoutScreenState extends State<AddworkoutScreen> {
+  final List<TextEditingController> stepcontroller = [];
   String? _selectDifficulty;
   String? selectedImage;
   String? selectedVideo;
   VideoPlayerController? _videoController;
   bool isVideoInitialized = false;
 
-  List<TextEditingController> stepcontroller = [];
-
   Future<void> initializeVideo() async {
-    if (selectedVideo != null) {
+    if (selectedVideo != null && File(selectedVideo!).existsSync()) {
       _videoController?.dispose();
       _videoController = VideoPlayerController.file(File(selectedVideo!));
-
       try {
         await _videoController!.initialize();
-        setState(() {
-          isVideoInitialized = true;
-        });
-        debugPrint('Video initialized successfully');
+        setState(() => isVideoInitialized = true);
       } catch (e) {
-        debugPrint('Error initializing video: $e');
-        setState(() {
-          isVideoInitialized = false;
-        });
+        setState(() => isVideoInitialized = false);
       }
+    } else {
+      setState(() => isVideoInitialized = false);
     }
   }
 
@@ -67,9 +65,7 @@ class _AddworkoutScreenState extends State<AddworkoutScreen> {
   Future<void> pickAndSetImage() async {
     final imagePath = await pickImage();
     if (imagePath != null) {
-      setState(() {
-        selectedImage = imagePath;
-      });
+      setState(() => selectedImage = imagePath);
     }
   }
 
@@ -90,9 +86,7 @@ class _AddworkoutScreenState extends State<AddworkoutScreen> {
   }
 
   void addStep() {
-    setState(() {
-      stepcontroller.add(TextEditingController());
-    });
+    setState(() => stepcontroller.add(TextEditingController()));
   }
 
   void removeSteps(int index) {
@@ -109,235 +103,96 @@ class _AddworkoutScreenState extends State<AddworkoutScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Add New Exercise',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+      appBar: AppBar(
+        title: const Text(
+          'Add New Exercise',
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 40),
+          child: Column(
+            spacing: 20,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Exercise Image Box
+              buildLabel('Exercise Image'),
+              WorkoutImageUploadBox(
+                selectedImage: selectedImage,
+                onPickImage: pickAndSetImage,
+              ),
+
+              // Workout Video Box
+              buildLabel('Workout Video'),
+              WorkoutVideoUploadBox(
+                selectedVideo: selectedVideo,
+                videoController: _videoController,
+                isVideoInitialized: isVideoInitialized,
+                onPickVideo: pickAndSetVideo,
+              ),
+
+              // How to Do Steps
+              WorkoutStepsInput(
+                stepControllers: stepcontroller,
+                onAddStep: addStep,
+                onRemoveStep: removeSteps,
+              ),
+
+              // Form fields
+              AddWorkoutFormFields(
+                nameController: widget._workoutNameController,
+                benefitController: widget._benifitController,
+                setsController: widget._workoutSetsController,
+                repeatController: widget._repeatController,
+                durationController: widget._durationController,
+                difficulty: _selectDifficulty,
+                onDifficultyChanged: (val) =>
+                    setState(() => _selectDifficulty = val),
+              ),
+
+              // Action Buttons
+              Row(
+                spacing: 15,
+                children: [
+                  cancelButtonForAddScreen(context),
+                  addingButtonForAddScreen(
+                    context,
+                    widget._workoutNameController,
+                    widget._durationController,
+                    saveWorkout,
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
-        body: ValueListenableBuilder<List<WorkoutsModel>>(
-          valueListenable: workoutsNotify,
-          builder: (_, value, __) {
-            return SingleChildScrollView(
-                child: Padding(
-                    padding: EdgeInsets.fromLTRB(24, 24, 24, 40),
-                    child: Column(
-                        spacing: 20,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          buildLabel('Exercise Name'),
-                          TextFormField(
-                            controller: widget._workoutNameController,
-                            decoration: InputDecoration(
-                              hintText: 'e.g., Push-ups, Squats',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.all(16),
-                            ),
-                          ),
-                          // ! Adding_Exercise_Image
-                          buildLabel('Exercise Image'),
-                          GestureDetector(
-                            onTap: pickAndSetImage,
-                            child: Container(
-                              width: double.infinity,
-                              height: 200,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.grey.shade300,
-                                  style: BorderStyle.solid,
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: selectedImage != null
-                                  ? Image.file(
-                                      File(selectedImage!),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : Column(
-                                      spacing: 8,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.image,
-                                          size: 40,
-                                        ),
-                                        Text(
-                                          'Click to upload ',
-                                          style: TextStyle(
-                                            color: Colors.grey.shade500,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                            ),
-                          ),
-                          // ! Benifts_Of_Workouts
-                          buildLabel('Benefits'),
-                          TextFormField(
-                            controller: widget._benifitController,
-                            maxLines: 4,
-                            decoration: InputDecoration(
-                              hintText: 'List the benefits of this exercise...',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.all(16),
-                            ),
-                          ),
-
-                          //! How to Do Workouts
-                          buildLabel('How to Do'),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: stepcontroller.length,
-                            itemBuilder: (context, index) {
-                              return Row(
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.fromLTRB(
-                                          0, 15, 0, 0),
-                                      child: TextFormField(
-                                          controller: stepcontroller[index],
-                                          decoration: InputDecoration(
-                                            hintText: 'Step ${index + 1}',
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          )),
-                                    ),
-                                  ),
-                                  IconButton(
-                                    icon:
-                                        const Icon(Icons.remove_circle_outline),
-                                    onPressed: () => removeSteps(index),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          //  ! It's For Dynamic _View Adding _Text Field !!
-                          dymaicViewofSteps(addStep),
-
-                          // !Video Uploaded
-                          buildLabel('Workout Video '),
-                          Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Colors.grey.shade300,
-                                width: 2,
-                              ),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: GestureDetector(
-                              onTap: pickAndSetVideo,
-                              child: selectedVideo == null
-                                  ? buildUploadPrompt()
-                                  : buildVideoPlayer(),
-                            ),
-                          ),
-                          // ! Sets||Reps||Dutation
-                          workoutAddingWrapedContents(
-                              widget._workoutSetsController,
-                              widget._repeatController,
-                              widget._durationController),
-
-                          buildLabel('Difficulty Level'),
-                          DropdownButtonFormField<String>(
-                            value: _selectDifficulty,
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              contentPadding: const EdgeInsets.all(16),
-                            ),
-                            items: ['Beginner', 'Intermediate', 'Advanced']
-                                .map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                alignment: AlignmentDirectional.center,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                            onChanged: (value) {
-                              setState(() {
-                                _selectDifficulty = value;
-                              });
-                            },
-                          ),
-                          Row(spacing: 15, children: [
-                            // !Canecl Button
-                            cancelButtonForAddScreen(context),
-                            addingButtonForAddScreen(
-                                context,
-                                widget._workoutNameController,
-                                widget._durationController,
-                                saveWorkout)
-                          ])
-                        ])));
-          },
-        ));
-  }
-
-  Widget buildVideoPlayer() {
-    if (!isVideoInitialized || _videoController == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    return Stack(alignment: Alignment.center, children: [
-      ClipRRect(
-          borderRadius: BorderRadius.circular(6),
-          child: AspectRatio(
-              aspectRatio: _videoController!.value.aspectRatio,
-              child: VideoPlayer(_videoController!))),
-      Container(
-          decoration: BoxDecoration(
-              color: appcolorblack, borderRadius: BorderRadius.circular(6))),
-      IconButton(
-          icon: Icon(
-              _videoController!.value.isPlaying ? null : Icons.play_arrow,
-              color: appcolorwhite,
-              size: 50),
-          onPressed: () {
-            setState(() {
-              _videoController!.value.isPlaying
-                  ? _videoController!.pause()
-                  : _videoController!.play();
-            });
-          })
-    ]);
+      ),
+    );
   }
 
   void saveWorkout() {
     final steps = stepcontroller.map((controller) => controller.text).toList();
-
     if (steps.any((steps) => steps.isEmpty)) {
       snackBarMessenger(context, "'Please fill all steps.'", appcolorRed);
       return;
     }
     final saveworkout = WorkoutsModel(
-        workoutsName: widget._workoutNameController.text,
-        woroutSteps: steps.join('\n'),
-        benifits: widget._benifitController.text,
-        numberOfSets: widget._workoutSetsController.text,
-        reps: widget._repeatController.text,
-        duration: widget._durationController.text,
-        difficulty: _selectDifficulty,
-        workoutsImage: selectedImage,
-        workoutvideo: selectedVideo);
+      workoutsName: widget._workoutNameController.text,
+      woroutSteps: steps.join('\n'),
+      benifits: widget._benifitController.text,
+      numberOfSets: widget._workoutSetsController.text,
+      reps: widget._repeatController.text,
+      duration: widget._durationController.text,
+      difficulty: _selectDifficulty,
+      workoutsImage: selectedImage,
+      workoutvideo: selectedVideo,
+    );
     addWorkout(saveworkout);
     getWorkouts();
+    // ignore: invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
     workoutsNotify.notifyListeners();
+    snackBarMessenger(context, '💪 Workout added successfully!', appcolorgreen);
     Navigator.pop(context);
   }
 }

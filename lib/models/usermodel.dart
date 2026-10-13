@@ -8,7 +8,7 @@ class Usermodel {
   String? id;
 
   @HiveField(1)
-  final String? fullName;
+  String? fullName;
 
   @HiveField(2)
   final String? email;

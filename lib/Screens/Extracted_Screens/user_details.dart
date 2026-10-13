@@ -42,7 +42,10 @@ class _UserDetailsState extends State<UserDetails> {
           );
         }
 
-        final details = user.firstWhere((element) => element.id == widget.id);
+        final details = user.firstWhere(
+          (element) => element.id == widget.id,
+          orElse: () => user.first,
+        );
 
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,

@@ -10,200 +10,38 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
+// ─── Shared helper ────────────────────────────────────────────────────────────
+void _showSnackbar(BuildContext context, String message, Color color) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      duration: const Duration(seconds: 2),
+    ),
+  );
+}
+
+// ─── Delete Workout ────────────────────────────────────────────────────────────
 Future<void> deletePopup(
     BuildContext context, WorkoutsModel work, String id) async {
   showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-              title: const Text(
-                'Are you Sure\nDelete this?',
-                textAlign: TextAlign.center,
-              ),
-              actions: [
-                Center(
-                    child: Column(
-                  children: [
-                    TextButton(
-                      onPressed: () async {
-                        deleteWorkout(id);
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Delete',
-                        style: GoogleFonts.jost(
-                          color: appcolorRed,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.jost(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                  ],
-                ))
-              ]));
-}
-
-// !DeletWorkoutFavorite<>>><>><><><><><
-
-Future<void> deletFAvorite(BuildContext context, WorkoutsModel workout) async {
-  showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-              title: const Text(
-                'Are you Sure\n Remove this?',
-                textAlign: TextAlign.center,
-              ),
-              actions: [
-                Center(
-                    child: Column(
-                  children: [
-                    TextButton(
-                      onPressed: () async {
-                        workout.favorite = false;
-                        await editWorkout(workout.id!, workout);
-                        workoutsNotify.value = workoutsNotify.value.toList();
-                        workoutsNotify.notifyListeners();
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Remove',
-                        style: GoogleFonts.jost(
-                          color: appcolorRed,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.jost(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                  ],
-                ))
-              ]));
-}
-
-// !Delet_HealthyDiet_Favorites<><><><><>>
-Future<void> deletHealthyDietFAvorite(
-    BuildContext context, HealtyDiet Diet) async {
-  showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-              title: const Text(
-                'Are you Sure\n Remove this?',
-                textAlign: TextAlign.center,
-              ),
-              actions: [
-                Center(
-                    child: Column(
-                  children: [
-                    TextButton(
-                      onPressed: () async {
-                        Diet.favorite = false;
-                        await editHealthyDiet(Diet.id!, Diet);
-                        healthyNotify.value = healthyNotify.value.toList();
-                        healthyNotify.notifyListeners();
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Remove',
-                        style: GoogleFonts.jost(
-                          color: appcolorRed,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.jost(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                  ],
-                ))
-              ]));
-}
-
-// ! Calculated BMI Deleting<><><><
-Future<void> calculateDelet(BuildContext context,
-    Box<BmiCalculate> bmiCalculateBox, Function() loadBmiHistory) async {
-  showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-              title: const Text(
-                'Are you Sure\n Clear BMI?',
-                textAlign: TextAlign.center,
-              ),
-              actions: [
-                Center(
-                    child: Column(
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        bmiCalculateBox.clear();
-                        loadBmiHistory();
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Clear',
-                        style: GoogleFonts.jost(
-                          color: appcolorRed,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text(
-                        'Cancel',
-                        style: GoogleFonts.jost(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      ),
-                    ),
-                  ],
-                ))
-              ]));
-}
-
-Future<void> deletHealthy(BuildContext context, int id) async {
-  showDialog(
     context: context,
     builder: (context) => AlertDialog(
-        title: const Text(
-          'Are you Sure\n Delete This?',
-          textAlign: TextAlign.center,
-        ),
-        actions: [
-          Center(
-              child: Column(
+      title: const Text(
+        'Are you Sure\nDelete this?',
+        textAlign: TextAlign.center,
+      ),
+      actions: [
+        Center(
+          child: Column(
             children: [
               TextButton(
-                onPressed: () {
-                  deletDiet(id);
+                onPressed: () async {
+                  deleteWorkout(id);
                   Navigator.pop(context);
+                  _showSnackbar(context, '🗑️ Workout deleted.', Colors.redAccent);
                 },
                 child: Text(
                   'Delete',
@@ -215,9 +53,7 @@ Future<void> deletHealthy(BuildContext context, int id) async {
                 ),
               ),
               TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
                 child: Text(
                   'Cancel',
                   style: GoogleFonts.jost(
@@ -225,7 +61,194 @@ Future<void> deletHealthy(BuildContext context, int id) async {
                 ),
               ),
             ],
-          ))
-        ]),
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+// ─── Remove Workout Favorite ───────────────────────────────────────────────────
+Future<void> deletFAvorite(BuildContext context, WorkoutsModel workout) async {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text(
+        'Are you Sure\n Remove this?',
+        textAlign: TextAlign.center,
+      ),
+      actions: [
+        Center(
+          child: Column(
+            children: [
+              TextButton(
+                onPressed: () async {
+                  workout.favorite = false;
+                  await editWorkout(workout.id!, workout);
+                  workoutsNotify.value = workoutsNotify.value.toList();
+                  workoutsNotify.notifyListeners();
+                  Navigator.pop(context);
+                  _showSnackbar(context, '💔 Removed from favorites.', Colors.redAccent);
+                },
+                child: Text(
+                  'Remove',
+                  style: GoogleFonts.jost(
+                    color: appcolorRed,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.jost(
+                      fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+// ─── Remove Healthy Diet Favorite ─────────────────────────────────────────────
+Future<void> deletHealthyDietFAvorite(
+    BuildContext context, HealtyDiet Diet) async {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text(
+        'Are you Sure\n Remove this?',
+        textAlign: TextAlign.center,
+      ),
+      actions: [
+        Center(
+          child: Column(
+            children: [
+              TextButton(
+                onPressed: () async {
+                  Diet.favorite = false;
+                  await editHealthyDiet(Diet.id!, Diet);
+                  healthyNotify.value = healthyNotify.value.toList();
+                  healthyNotify.notifyListeners();
+                  Navigator.pop(context);
+                  _showSnackbar(context, '💔 Removed from diet favorites.', Colors.redAccent);
+                },
+                child: Text(
+                  'Remove',
+                  style: GoogleFonts.jost(
+                    color: appcolorRed,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.jost(
+                      fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+// ─── Clear BMI History ─────────────────────────────────────────────────────────
+Future<void> calculateDelet(BuildContext context,
+    Box<BmiCalculate> bmiCalculateBox, Function() loadBmiHistory) async {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text(
+        'Are you Sure\n Clear BMI?',
+        textAlign: TextAlign.center,
+      ),
+      actions: [
+        Center(
+          child: Column(
+            children: [
+              TextButton(
+                onPressed: () {
+                  bmiCalculateBox.clear();
+                  loadBmiHistory();
+                  Navigator.pop(context);
+                  _showSnackbar(context, '🗑️ BMI history cleared.', Colors.redAccent);
+                },
+                child: Text(
+                  'Clear',
+                  style: GoogleFonts.jost(
+                    color: appcolorRed,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.jost(
+                      fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+// ─── Delete Healthy Diet ───────────────────────────────────────────────────────
+Future<void> deletHealthy(BuildContext context, int id) async {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text(
+        'Are you Sure\n Delete This?',
+        textAlign: TextAlign.center,
+      ),
+      actions: [
+        Center(
+          child: Column(
+            children: [
+              TextButton(
+                onPressed: () {
+                  deletDiet(id);
+                  Navigator.pop(context);
+                  _showSnackbar(context, '🗑️ Diet deleted.', Colors.redAccent);
+                },
+                child: Text(
+                  'Delete',
+                  style: GoogleFonts.jost(
+                    color: appcolorRed,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text(
+                  'Cancel',
+                  style: GoogleFonts.jost(
+                      fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
+    ),
   );
 }

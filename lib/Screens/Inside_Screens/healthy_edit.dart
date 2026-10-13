@@ -59,12 +59,15 @@ class HealthyEdit extends StatelessWidget {
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: changeImage != null
-                  ? Image.file(
-                      File(changeImage!),
-                      width: screenwidth * 0.8,
-                      height: screenwidth * 0.8,
-                      fit: BoxFit.cover,
+              child: (changeImage != null && File(changeImage!).existsSync())
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        File(changeImage!),
+                        width: screenwidth * 0.8,
+                        height: screenwidth * 0.8,
+                        fit: BoxFit.cover,
+                      ),
                     )
                   : Column(
                       spacing: screenwidth * 0.04,
@@ -108,6 +111,19 @@ class HealthyEdit extends StatelessWidget {
               textButton(() => Navigator.pop(context), 'CANCEL',
                   EdgeInsets.zero, appcolorRed),
               textButton(() async {
+                if (changName.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Please enter a food name.'),
+                      backgroundColor: Colors.redAccent,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  return;
+                }
                 double changeCalories =
                     double.tryParse(changCalories.text) ?? 0.0;
                 final updatedDiet = HealtyDiet(
@@ -115,11 +131,25 @@ class HealthyEdit extends StatelessWidget {
                     healthname: changName.text,
                     healthcalories: changeCalories,
                     healthdescribe: changDescription.text,
-                    healthimage: changeImage);
-                editHealthyDiet(changDiets.id!, updatedDiet);
-                getHealtyDiet();
+                    healthimage: changeImage,
+                    dateTime: changDiets.dateTime ?? DateTime.now(),
+                    favorite: changDiets.favorite);
+                await editHealthyDiet(changDiets.id ?? '', updatedDiet);
+                await getHealtyDiet();
                 healthyNotify.notifyListeners();
-                Navigator.pop(context);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('✅ Diet updated successfully!'),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  Navigator.pop(context, updatedDiet);
+                }
               }, 'EDITE DIETES', EdgeInsets.zero, appcolorgreen),
             ],
           )

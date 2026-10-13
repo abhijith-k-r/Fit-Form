@@ -93,7 +93,7 @@ class _AdvancedLevelsState extends State<AdvancedLevels> {
               left: 15,
               right: 15,
               bottom: 0,
-              child: Container(
+              child: Material(
                   color: isDark.value ? appcolorblack : appcolorwhite,
                   child: ValueListenableBuilder(
                     valueListenable: workoutsNotify,

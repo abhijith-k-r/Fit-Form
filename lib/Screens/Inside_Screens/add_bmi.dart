@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:fit_form/App_Colors/app_colors.dart';
 import 'package:fit_form/Extracted_Functions/diet_tracker.dart';
 import 'package:fit_form/Screens/Bottom_Nav_Screens.dart/DietPlanner/bmi_calculator.dart';
-import 'package:fit_form/Screens/Bottom_Nav_Screens.dart/DietPlanner/healty_diets.dart' as dietPlanner;
+import 'package:fit_form/Screens/Bottom_Nav_Screens.dart/DietPlanner/healty_diets.dart' as diet_planner;
 import 'package:fit_form/Screens/Extracted_Screens/delet_funcion.dart';
 import 'package:fit_form/functions/bmi_functio.dart';
 import 'package:fit_form/models/bmi_calculator_model.dart';
@@ -282,7 +282,7 @@ class _BmiAddScreeState extends State<BmiAddScree> {
               ),
               const SizedBox(height: 20),
               DropdownButtonFormField<String>(
-                value: selectedCategory,
+                initialValue: selectedCategory,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -309,25 +309,35 @@ class _BmiAddScreeState extends State<BmiAddScree> {
               ),
               const SizedBox(height: 20),
               Row(
-                  spacing: 20,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    textButton(
-                        () => _isLoading ? null : updateInstruction(),
-                        _isLoading ? 'Updating...' : 'Update',
-                        EdgeInsets.zero,
-                        appcolorblue),
-                    textButton(
-                        () => _isLoading ? null : saveInstruction(),
-                        _isLoading ? "Saving..." : "SAVE",
-                        EdgeInsets.zero,
-                        appcolorgreen),
-                    textButton(
-                        () => _isLoading ? null : clearAll(),
-                        _isLoading ? 'Clearing...' : 'Clear All',
-                        EdgeInsets.zero,
-                        appcolorRed)
-                  ])
+                children: [
+                  Expanded(
+                    child: textButton(
+                      () => _isLoading ? null : updateInstruction(),
+                      _isLoading ? 'Updating...' : 'Update',
+                      EdgeInsets.zero,
+                      appcolorblue,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: textButton(
+                      () => _isLoading ? null : saveInstruction(),
+                      _isLoading ? "Saving..." : "SAVE",
+                      EdgeInsets.zero,
+                      appcolorgreen,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: textButton(
+                      () => _isLoading ? null : clearAll(),
+                      _isLoading ? 'Clearing...' : 'Clear All',
+                      EdgeInsets.zero,
+                      appcolorRed,
+                    ),
+                  ),
+                ],
+              ),
             ])));
   }
 }

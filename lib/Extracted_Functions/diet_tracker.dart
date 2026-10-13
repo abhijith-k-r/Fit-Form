@@ -132,7 +132,7 @@ Widget predefinedDietCategories(BuildContext context, String bmicategoryItems) {
               margin: const EdgeInsets.symmetric(horizontal: 8),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: appcolorgrey.withOpacity(0.1),
+                color: appcolorgrey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Column(

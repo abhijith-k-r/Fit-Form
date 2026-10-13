@@ -61,7 +61,8 @@ class BeginnerTabBar extends StatelessWidget {
                 onLongPress: () async {
                   deletePopup(context, workout, workout.id!);
                 },
-                leading: workout.workoutsImage != null
+                leading: (workout.workoutsImage != null &&
+                        File(workout.workoutsImage!).existsSync())
                     ? Container(
                         width: 50,
                         height: 50,
@@ -69,7 +70,7 @@ class BeginnerTabBar extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           image: DecorationImage(
                             image: FileImage(File(workout.workoutsImage!)),
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       )
@@ -78,9 +79,9 @@ class BeginnerTabBar extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: appcolorgrey,
+                          color: appcolorgrey.shade300,
                         ),
-                        child: Icon(Icons.fitness_center),
+                        child: Icon(Icons.fitness_center, color: appcolorblack),
                       ),
                 title: Text(workout.workoutsName!,
                     style: GoogleFonts.jost(fontWeight: FontWeight.bold)),
@@ -147,7 +148,8 @@ class IntermediateTabBar extends StatelessWidget {
                     )),
                 onLongPress: () async =>
                     deletePopup(context, workout, workout.id!),
-                leading: workout.workoutsImage != null
+                leading: (workout.workoutsImage != null &&
+                        File(workout.workoutsImage!).existsSync())
                     ? Container(
                         width: 50,
                         height: 50,
@@ -155,7 +157,7 @@ class IntermediateTabBar extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           image: DecorationImage(
                             image: FileImage(File(workout.workoutsImage!)),
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       )
@@ -164,9 +166,9 @@ class IntermediateTabBar extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: appcolorgrey,
+                          color: appcolorgrey.shade300,
                         ),
-                        child: Icon(Icons.fitness_center),
+                        child: Icon(Icons.fitness_center, color: appcolorblack),
                       ),
                 title: Text(workout.workoutsName!,
                     style: GoogleFonts.jost(fontWeight: FontWeight.bold)),
@@ -231,7 +233,8 @@ class AdvacedTabBar extends StatelessWidget {
                               change: workout,
                             ))),
                 onLongPress: () => deletePopup(context, workout, workout.id!),
-                leading: workout.workoutsImage != null
+                leading: (workout.workoutsImage != null &&
+                        File(workout.workoutsImage!).existsSync())
                     ? Container(
                         width: 50,
                         height: 50,
@@ -239,7 +242,7 @@ class AdvacedTabBar extends StatelessWidget {
                           borderRadius: BorderRadius.circular(8),
                           image: DecorationImage(
                             image: FileImage(File(workout.workoutsImage!)),
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                           ),
                         ),
                       )
@@ -248,9 +251,9 @@ class AdvacedTabBar extends StatelessWidget {
                         height: 50,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: appcolorgrey,
+                          color: appcolorgrey.shade300,
                         ),
-                        child: Icon(Icons.fitness_center),
+                        child: Icon(Icons.fitness_center, color: appcolorblack),
                       ),
                 title: Text(workout.workoutsName!,
                     style: GoogleFonts.jost(fontWeight: FontWeight.bold)),
