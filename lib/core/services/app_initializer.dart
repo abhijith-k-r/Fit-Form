@@ -1,8 +1,8 @@
-import 'package:fit_form/features/auth/data/auth_data_source.dart';
 import 'package:fit_form/features/bmi/data/bmi_data_source.dart';
 import 'package:fit_form/features/calendar_events/data/calendar_data_source.dart';
 import 'package:fit_form/features/diet_planner/data/diet_data_source.dart';
 import 'package:fit_form/features/diet_planner/data/healthy_diet_data_source.dart';
+import 'package:fit_form/features/profile/data/user_data_source.dart';
 import 'package:fit_form/features/workouts/data/completed_workout_data_source.dart';
 import 'package:fit_form/features/workouts/data/workout_data_source.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -15,7 +15,7 @@ class AppInitializer {
 
   static Future<void> init() async {
     await Hive.initFlutter();
-    await AuthDataSource.initialize();
+    await UserDataSource.initialize();
     await WorkoutDataSource.initialize();
     await CalendarDataSource.initialize();
     await DietDataSource.initialize();

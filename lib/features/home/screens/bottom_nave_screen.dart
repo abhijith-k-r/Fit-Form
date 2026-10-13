@@ -1,5 +1,3 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:fit_form/App_Colors/app_colors.dart';
 import 'package:fit_form/features/calendar_events/screens/calendar_events_scree.dart';
 import 'package:fit_form/features/calendar_events/screens/customize_screen.dart';
@@ -26,7 +24,6 @@ class _BottomNaveScreenState extends State<BottomNaveScreen> {
   void initState() {
     super.initState();
     getData();
-
     _screens = [
       HomeScreen(id: widget.id),
       const CalendarEvents(),
@@ -43,9 +40,7 @@ class _BottomNaveScreenState extends State<BottomNaveScreen> {
         MaterialPageRoute(builder: (context) => const DietTrackMenuScreen()),
       );
     } else {
-      setState(() {
-        _selectedIndex = index;
-      });
+      setState(() => _selectedIndex = index);
     }
   }
 
@@ -54,6 +49,9 @@ class _BottomNaveScreenState extends State<BottomNaveScreen> {
     return ValueListenableBuilder<bool>(
       valueListenable: isDark,
       builder: (context, isDarkMode, _) {
+        final navBg = isDarkMode
+            ? const Color.fromARGB(255, 37, 36, 36)
+            : appcolorwhite;
         return Scaffold(
           body: _screens[_selectedIndex],
           bottomNavigationBar: Container(
@@ -73,35 +71,18 @@ class _BottomNaveScreenState extends State<BottomNaveScreen> {
               borderRadius: BorderRadius.circular(35),
               child: BottomNavigationBar(
                 type: BottomNavigationBarType.fixed,
-                backgroundColor: isDarkMode
-                    ? const Color.fromARGB(255, 37, 36, 36)
-                    : appcolorwhite,
+                backgroundColor: navBg,
                 selectedItemColor: appcolorRed,
                 unselectedItemColor:
                     isDarkMode ? appcolorwhite : appcolorblack,
                 currentIndex: _selectedIndex,
                 onTap: _onItemTapped,
                 items: const [
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
-                    label: 'Home',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.calendar_month_outlined),
-                    label: 'Calendar',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.restaurant),
-                    label: 'Diet Track',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.fitness_center_sharp),
-                    label: 'Customize',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: Icon(Icons.person_pin),
-                    label: 'Profile',
-                  ),
+                  BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+                  BottomNavigationBarItem(icon: Icon(Icons.calendar_month_outlined), label: 'Calendar'),
+                  BottomNavigationBarItem(icon: Icon(Icons.restaurant), label: 'Diet Track'),
+                  BottomNavigationBarItem(icon: Icon(Icons.fitness_center_sharp), label: 'Customize'),
+                  BottomNavigationBarItem(icon: Icon(Icons.person_pin), label: 'Profile'),
                 ],
               ),
             ),
@@ -111,4 +92,3 @@ class _BottomNaveScreenState extends State<BottomNaveScreen> {
     );
   }
 }
- 

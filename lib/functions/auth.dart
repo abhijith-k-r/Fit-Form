@@ -1,27 +1,18 @@
 library;
 
-// Legacy compatibility shim.
-/// Auth logic has moved to:
-///   lib/features/auth/data/auth_data_source.dart
-///
-/// Navigation is now the CALLER's responsibility.
-/// Screens calling addsignIn must handle navigation themselves.
+// Compatibility shim for user profile data.
+/// Profile storage logic is in:
+///   lib/features/profile/data/user_data_source.dart
 
-export 'package:fit_form/features/auth/data/auth_data_source.dart'
-    show AuthDataSource, userNotifier;
+export 'package:fit_form/features/profile/data/user_data_source.dart'
+    show UserDataSource, userNotifier;
 
-import 'package:fit_form/features/auth/data/auth_data_source.dart';
+import 'package:fit_form/features/profile/data/user_data_source.dart';
 import 'package:fit_form/models/usermodel.dart';
 
-/// Old notifier name kept for compatibility.
+/// Legacy notifier alias kept for compatibility.
 final userDatas = userNotifier;
 
-Future<void> hiveInitialize() => AuthDataSource.initialize();
-Future<void> addSignUp(Usermodel user) => AuthDataSource.signUp(user);
-Future<void> getData() => AuthDataSource.refresh();
-Future<void> logOut(String id) => AuthDataSource.logOut(id);
-
-/// NOTE: This no longer accepts [BuildContext].
-/// Callers must handle navigation after checking the return value.
-Future<Usermodel?> addsignIn(String email, String password) =>
-    AuthDataSource.signIn(email, password);
+Future<void> hiveInitialize() => UserDataSource.initialize();
+Future<void> addSignUp(Usermodel user) => UserDataSource.save(user);
+Future<void> getData() => UserDataSource.refresh();
