@@ -1,4 +1,4 @@
-package com.example.fit_form
+package com.abhijithkr.fitform
 
 import io.flutter.embedding.android.FlutterActivity
 

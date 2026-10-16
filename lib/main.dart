@@ -8,7 +8,11 @@ ValueNotifier<bool> isDark = ValueNotifier<bool>(false);
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await AppInitializer.init();
+  try {
+    await AppInitializer.init();
+  } catch (e, stack) {
+    debugPrint('AppInitializer startup error: $e\n$stack');
+  }
   runApp(const FitFormApp());
 }
 
